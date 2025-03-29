@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridOptions } from 'ag-grid-community';
 import StarRating from './StarRating';
 import booksData from '../data/books.json';
 
