@@ -1,0 +1,39 @@
+{
+  "name": "book-rating-app",
+  "version": "1.0.0",
+  "description": "A simple React application to display a list of books with ratings.",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+    "test": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@types/node": "^16.18.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "ag-grid-community": "^29.0.0",
+    "ag-grid-react": "^29.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    
+  },
+  "license": "MIT",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
