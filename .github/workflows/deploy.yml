@@ -1,18 +1,16 @@
 name: Deploy to Local Server
 
 on:
-  workflow_dispatch: # Manual trigger
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
+  push:
     branches:
       - main
       - feature/gh-actions
 
+
 jobs:
-  deploy:
+  deployment:
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
       - name: Checkout code
