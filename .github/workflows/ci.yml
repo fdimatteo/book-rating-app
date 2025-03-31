@@ -10,6 +10,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   CONTAINER_NAME: ${{ github.event.repository.name }}
+  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   lint-test:
