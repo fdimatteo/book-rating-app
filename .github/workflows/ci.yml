@@ -68,8 +68,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            REACT_APP_GIT_SHA=${{ github.sha }}
-            REACT_APP_BUILD_DATE=$(date -u +'%Y-%m-%d %H:%M:%S')
+            GITHUB_SHA=${{ github.sha }}
+            BUILD_DATE=$(date -u +'%Y-%m-%d %H:%M:%S')
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
