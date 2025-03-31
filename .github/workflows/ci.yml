@@ -67,9 +67,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
+          build-args:
             COMMIT_SHA=${{ github.sha }}
-            BUILD_DATE="$(date -u +'%Y-%m-%d %H:%M:%S')"
+            BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%S')"
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
