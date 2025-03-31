@@ -5,7 +5,7 @@
   "main": "src/index.tsx",
   "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && export BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S') && react-scripts build",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint --ext .ts,.tsx src/",
