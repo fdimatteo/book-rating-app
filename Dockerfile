@@ -2,7 +2,7 @@
 FROM node:18-alpine as build
 
 ARG COMMIT_SHA
-ARG BUILD_DATE=$(date -u +'%Y-%m-%d %H:%M:%S')
+ARG BUILD_DATE
 
 WORKDIR /app
 
