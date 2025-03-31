@@ -127,10 +127,12 @@ jobs:
         run: |
           docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
           docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
-          docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.ref_name }}
+          docker push $${{ needs.build.outputs.tags }}
           docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
           docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.ref_name }}
+
+    outputs:
+      tags: ${{ needs.build.outputs.tags }}
 
   deploy:
     needs: release
@@ -147,8 +149,8 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            podman pull ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.ref_name }}
+            podman pull ${{ needs.release.outputs.tags }}
             podman stop ${{ env.CONTAINER_NAME }} || true
             podman rm ${{ env.CONTAINER_NAME }} || true
-            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.ref_name }}
+            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ needs.release.outputs.tags }}
             
