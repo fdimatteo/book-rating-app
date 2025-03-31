@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  CONTAINER_NAME: ${{ github.event.repository.name }}
 
 jobs:
   lint-test:
@@ -83,7 +84,7 @@ jobs:
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             podman pull ${{ steps.meta.outputs.tags }}
-            podman stop ${{ env.IMAGE_NAME }} || true
-            podman rm ${{ env.IMAGE_NAME }} || true
-            podman run -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ steps.meta.outputs.tags }}
+            podman stop ${{ env.CONTAINER_NAME }} || true
+            podman rm ${{ env.CONTAINER_NAME }} || true
+            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ steps.meta.outputs.tags }}
             
