@@ -1,6 +1,7 @@
-name: Deploy
+name: Deploy to Local Server
 
 on:
+  workflow_dispatch: # Manual trigger
   workflow_run:
     workflows: ["CI"]
     types:
@@ -10,18 +11,22 @@ on:
       - feature/gh-actions
 
 jobs:
-  deploy-local:
+  deploy:
     runs-on: ubuntu-latest
-    environment: development
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Deploy to local VM
-      run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key
-        chmod 600 ssh_key
-        docker-compose -H "ssh://${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}" up -d
-      env:
-        DOCKER_HOST: "ssh://${{ secrets.SERVER_USERNAME }}@{{ secrets.SERVER_IP }}"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/book-rating-app
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            podman-compose down
+            podman-compose up -d
