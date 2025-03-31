@@ -69,7 +69,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             COMMIT_SHA=${{ github.sha }}
-            BUILD_TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M:%S')
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
