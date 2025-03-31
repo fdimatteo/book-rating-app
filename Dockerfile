@@ -1,4 +1,7 @@
 
+ARG COMMIT_SHA
+ARG BUILD_TIMESTAMP
+
 # Build stage
 FROM node:18-alpine as build
 
