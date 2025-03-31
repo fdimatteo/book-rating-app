@@ -17,8 +17,6 @@ book-rating-app
 ├── src
 │   ├── components
 │   │   ├── BookList.tsx
-│   │   ├── BookItem.tsx
-│   │   └── StarRating.tsx
 │   ├── data
 │   │   └── books.json
 │   ├── App.tsx
