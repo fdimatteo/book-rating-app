@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - feature/gh-actions
+
+jobs:
+  deploy-local:
+    runs-on: ubuntu-latest
+    environment: development
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to local VM
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key
+        chmod 600 ssh_key
+        docker-compose -H "ssh://${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}" up -d
+      env:
+        DOCKER_HOST: "ssh://${{ secrets.SERVER_USERNAME }}@{{ secrets.SERVER_IP }}"
