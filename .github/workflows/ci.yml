@@ -82,8 +82,8 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            podman pull ${{ steps.push.image.name }}
             podman stop ${{ env.IMAGE_NAME }} || true
             podman rm ${{ env.IMAGE_NAME }} || true
-            podman run -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            podman run -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ steps.push.image.name }}
             
