@@ -23,7 +23,12 @@ const App: React.FC = () => {
         bottom: '10px', 
         right: '10px',
         fontSize: '12px',
-        color: '#666'
+        color: '#666',
+        backgroundColor: 'rgba(255, 250, 205, 0.8)',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        fontWeight: 'bold'
       }}>
         Commit: {sha.substring(0, 6)} • Released: {buildDate}
       </div>
