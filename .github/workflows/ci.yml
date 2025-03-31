@@ -127,7 +127,7 @@ jobs:
         run: |
           docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
           docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
-          docker push $${{ needs.build.outputs.tags }}
+          docker push ${{ needs.build.outputs.tags }}
           docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
           docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
 
