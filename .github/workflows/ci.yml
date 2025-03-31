@@ -30,7 +30,7 @@ jobs:
       - name: Test
         run: npm test
   
-  release:
+  release-deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -69,3 +69,18 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+      - name: Deploy to Server
+        id: action-ssh
+        uses: tiyee/action-ssh@v1.0.1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          command: |
+            podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            podman stop ${{ env.IMAGE_NAME }} || true
+            podman rm ${{ env.IMAGE_NAME }} || true
+            podman run -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            
