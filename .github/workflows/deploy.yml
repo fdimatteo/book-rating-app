@@ -1,6 +1,7 @@
 name: Deploy to Local Server
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
