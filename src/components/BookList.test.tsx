@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import mockBooks from '../data/mockBooks.json';
 import BookListTest from './BookList';
 
 describe('BookList', () => {
@@ -16,10 +17,7 @@ describe('BookList', () => {
   });
 
   test('renders books when provided', () => {
-    const testBooks = [
-      { id: 1, title: 'Test Book 1', rating: 4, author: 'Test Author 1' },
-      { id: 2, title: 'Test Book 2', rating: 5, author: 'Test Author 2' }
-    ];
+    const testBooks = mockBooks;
     
     render(<BookListTest books={testBooks} />);
     testBooks.forEach(book => {
