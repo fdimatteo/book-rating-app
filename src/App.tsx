@@ -3,6 +3,7 @@ import BookList from './components/BookList';
 
 const App: React.FC = () => {
   const sha = process.env.REACT_APP_GIT_SHA || 'dev';
+  const tag = process.env.REACT_APP_GIT_TAG || 'n/a';
   const buildDate = process.env.REACT_APP_BUILD_DATE || new Date().toISOString().split('T').join(' ');
 
   return (
@@ -30,7 +31,7 @@ const App: React.FC = () => {
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         fontWeight: 'bold'
       }}>
-        Commit: {sha.substring(0, 6)} • Released: {buildDate}
+        Release: {tag} • Commit: {sha.substring(0, 6)} • Released: {buildDate}
       </div>
     </div>
   );
