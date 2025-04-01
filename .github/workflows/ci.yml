@@ -93,6 +93,7 @@ jobs:
           outputs: type=docker,dest=${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
           build-args:
             COMMIT_SHA=${{ github.sha }}
+            GIT_TAG=${{ env.GIT_TAG }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
