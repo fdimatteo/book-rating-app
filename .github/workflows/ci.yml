@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
-      - feature/gh-actions
+  pull_request: 
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  # IMAGE_NAME: ${{ github.repository }} # fdimatteo/book-rating-app
   REPO_NAME: ${{ github.repository }} # fdimatteo/book-rating-app
   IMAGE_NAME: ${{ github.event.repository.name }} # book-rating-app
   CONTAINER_NAME: ${{ github.event.repository.name }} # book-rating-app
@@ -35,7 +37,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    needs: lint
     environment: development
 
     steps:
@@ -53,7 +54,9 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: test
+    needs: 
+      - lint
+      - test
     environment: development
 
     steps:
@@ -91,7 +94,7 @@ jobs:
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
 
-  release:
+  publish:
     runs-on: ubuntu-latest
     needs: build
     environment: development
@@ -135,7 +138,7 @@ jobs:
       tags: ${{ needs.build.outputs.tags }}
 
   deploy:
-    needs: release
+    needs: publish
     runs-on: ubuntu-latest
     environment: development
     
@@ -149,8 +152,8 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            podman pull ${{ needs.release.outputs.tags }}
+            podman pull ${{ needs.publish.outputs.tags }}
             podman stop ${{ env.CONTAINER_NAME }} || true
             podman rm ${{ env.CONTAINER_NAME }} || true
-            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ needs.release.outputs.tags }}
+            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ needs.publish.outputs.tags }}
             
