@@ -91,7 +91,7 @@ jobs:
             ${{ env.IMAGE_TAG_SHA }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
-          build-args:
+          build-args: |
             COMMIT_SHA=${{ github.sha }}
             GIT_TAG=${{ env.GIT_TAG }}
 
