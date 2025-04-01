@@ -18,8 +18,10 @@ env:
   REPO_NAME: ${{ github.repository }} # fdimatteo/book-rating-app
   IMAGE_NAME: ${{ github.event.repository.name }} # book-rating-app
   CONTAINER_NAME: ${{ github.event.repository.name }} # book-rating-app
+  IMAGE_TAG_SHA: ghcr.io/${{ github.repository }}:${{ github.sha }}
   COMMIT_SHA: ${{ github.sha }}
   GIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'n/a' }}
+
 
 jobs:
   
@@ -84,11 +86,14 @@ jobs:
         with:
           context: .
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ env.IMAGE_TAG_SHA }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
-          build-args:
+          build-args: |
             COMMIT_SHA=${{ github.sha }}
+            GIT_TAG=${{ env.GIT_TAG }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -133,11 +138,13 @@ jobs:
 
       - name: Tag and Push Docker image
         run: |
-          docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
-          docker tag ${{ needs.build.outputs.tags }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
-          docker push ${{ needs.build.outputs.tags }}
+          if [ github.ref_type == 'tag' ]; then
+            docker tag ${{ env.IMAGE_TAG_SHA }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ env.GIT_TAG }}
+            docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ env.GIT_TAG }}
+          fi
+          docker push ${{ env.IMAGE_TAG_SHA }}
+          docker tag ${{ env.IMAGE_TAG_SHA }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
           docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ github.sha }}
 
     outputs:
       tags: ${{ needs.build.outputs.tags }}
@@ -157,7 +164,7 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            podman pull ${{ needs.publish.outputs.tags }}
+            podman pull ${{ env.IMAGE_TAG_SHA }}
             podman stop ${{ env.CONTAINER_NAME }} || true
             podman rm ${{ env.CONTAINER_NAME }} || true
-            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ needs.publish.outputs.tags }}
+            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.IMAGE_TAG_SHA }}
