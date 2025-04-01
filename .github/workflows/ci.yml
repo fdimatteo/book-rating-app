@@ -151,7 +151,8 @@ jobs:
 
   deploy:
     needs: publish
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: development
     
     steps:
