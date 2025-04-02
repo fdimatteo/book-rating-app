@@ -21,7 +21,8 @@ env:
   IMAGE_TAG_SHA: ghcr.io/${{ github.repository }}:${{ github.sha }}
   COMMIT_SHA: ${{ github.sha }}
   GIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'n/a' }}
-
+  AZURE_CLUSTER_NAME: myAKSCluster
+  AZURE_RESOURCE_GROUP: bookRatingAppGroup
 
 jobs:
   
@@ -175,16 +176,16 @@ jobs:
     environment: development
 
     steps:
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - uses: azure/setup-kubectl@v4
 
-    - name: Azure CLI script
-      uses: azure/cli@v2
+    - uses: Azure/aks-set-context@v4
       with:
-        azcliversion: latest
-        inlineScript: |
-          az aks get-credentials --resource-group bookRatingAppGroup --name myAKSCluster
-          kubectl set image deployment/${{ env.CONTAINER_NAME }} book-rating-app=${{ env.IMAGE_TAG_SHA }}
-          kubectl rollout restart deployment//${{ env.CONTAINER_NAME }}
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          cluster-name: ${{ env.AZURE_CLUSTER_NAME }}
+          resource-group: ${ env.AZURE_RESOURCE_GROUP }}
+
+    - uses: Azure/k8s-deploy@v5
+      with:
+          action: deploy
+          images: |
+            ${{ env.IMAGE_TAG_SHA }}
