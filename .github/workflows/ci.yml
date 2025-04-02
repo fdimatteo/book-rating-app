@@ -170,7 +170,9 @@ jobs:
             podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.IMAGE_TAG_SHA }}
 
   deploy-dev-az:
+    needs: publish
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
     - name: Checkout repository
