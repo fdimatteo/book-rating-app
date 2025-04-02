@@ -17,6 +17,7 @@ spec:
       containers:
         - name: book-rating-app
           image: ghcr.io/fdimatteo/book-rating-app:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           resources:
