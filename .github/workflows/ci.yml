@@ -149,9 +149,8 @@ jobs:
     outputs:
       tags: ${{ needs.build.outputs.tags }}
 
-  deploy:
+  deploy-dev-local:
     needs: publish
-    # runs-on: ubuntu-latest
     runs-on: self-hosted
     environment: development
     
@@ -169,3 +168,25 @@ jobs:
             podman stop ${{ env.CONTAINER_NAME }} || true
             podman rm ${{ env.CONTAINER_NAME }} || true
             podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.IMAGE_TAG_SHA }}
+
+  deploy-dev-az:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Azure CLI
+      uses: azure/CLI@v2
+
+    - name: Login to Azure
+      run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Deploy to AKS
+      run: |
+        az aks get-credentials --resource-group bookRatingAppGroup --name myAKSCluster
+        kubectl set image deployment/${{ env.CONTAINER_NAME }} book-rating-app=${{ env.IMAGE_TAG_SHA }}
+
+    - name: Refresh Deployment
+      run: |
+        kubectl rollout restart deployment//${{ env.CONTAINER_NAME }}
