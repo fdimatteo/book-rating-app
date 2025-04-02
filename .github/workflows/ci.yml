@@ -19,6 +19,7 @@ env:
   IMAGE_NAME: ${{ github.event.repository.name }} # book-rating-app
   CONTAINER_NAME: ${{ github.event.repository.name }} # book-rating-app
   IMAGE_TAG_SHA: ghcr.io/${{ github.repository }}:${{ github.sha }}
+  IMAGE_PULL_TAG: ghcr.io/${{ github.repository }}:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
   COMMIT_SHA: ${{ github.sha }}
   GIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'n/a' }}
   AZURE_CLUSTER_NAME: myAKSCluster
@@ -139,7 +140,7 @@ jobs:
 
       - name: Tag and Push Docker image
         run: |
-          if [ github.ref_type == 'tag' ]; then
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
             docker tag ${{ env.IMAGE_TAG_SHA }} ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ env.GIT_TAG }}
             docker push ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:${{ env.GIT_TAG }}
           fi
@@ -165,10 +166,10 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
           command: |
             podman login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            podman pull ${{ env.IMAGE_TAG_SHA }}
+            podman pull ${{ env.IMAGE_PULL_TAG }}
             podman stop ${{ env.CONTAINER_NAME }} || true
             podman rm ${{ env.CONTAINER_NAME }} || true
-            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.IMAGE_TAG_SHA }}
+            podman run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 ${{ env.IMAGE_PULL_TAG }}
 
   deploy-dev-az:
     needs: publish
@@ -195,4 +196,4 @@ jobs:
             manifests: |
               k8s/manifest.yaml
             images: |
-              ${{ env.IMAGE_TAG_SHA }}
+              ${{ env.IMAGE_PULL_TAG }}
