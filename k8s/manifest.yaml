@@ -16,5 +16,13 @@ spec:
     spec:
       containers:
         - name: book-rating-app
+          image: ghcr.io/fdimatteo/book-rating-app:latest
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
